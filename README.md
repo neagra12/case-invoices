@@ -2,7 +2,7 @@
 
 Acme Corp is a PE-backed manufacturer losing **$2M/year** to manual invoice processing: 30% error rates, 5-day delays, and no audit trail. This system replaces that workflow with a fully automated, 4-agent pipeline that ingests any invoice format, validates against inventory, applies VP-level approval logic, and processes payment — all with no human intervention for routine cases.
 
-**[Live Demo](https://case-invoices-task.streamlit.app/)**
+**[Live](https://case-invoices-task.streamlit.app/)**
 
 ---
 
