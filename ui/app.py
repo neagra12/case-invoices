@@ -961,9 +961,9 @@ def mode_batch():
     for fname, state, elapsed in results:
         pay    = state.get("payment_result") or {}
         status = (pay.get("status") or ("error" if state.get("error") else "—")).upper()
-        icon   = "✅" if status=="PAID" else "🚫" if status=="REJECTED" else "⚠️"
+        icon   = "✓" if status=="PAID" else "✗" if status=="REJECTED" else "!"
         inv    = state.get("invoice_data") or {}
-        label  = f"{icon} {Path(fname).name}  ·  {inv.get('invoice_number','?')}  ·  ${inv.get('total',0):,.2f}  ·  {status}"
+        label  = f"{icon}  {Path(fname).name}  ·  {inv.get('invoice_number','?')}  ·  ${inv.get('total',0):,.2f}  ·  {status}"
         with st.expander(label):
             render_result(state, compact=True)
 
