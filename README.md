@@ -20,6 +20,9 @@ Acme Corp is a PE-backed manufacturer losing **$2M/year** to manual invoice proc
 **Batch Completion**
 ![Batch Completion](Output.png)
 
+**Individual Inv**
+![Individual Inv](Op.png)
+
 ---
 
 ## Setup & Installation
