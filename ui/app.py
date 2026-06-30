@@ -53,7 +53,7 @@ section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; 
 [data-testid="stSidebar"] * { color: #cbd5e1 !important; }
 [data-testid="stSidebar"] hr { border-color: #1e293b !important; }
 
-/* Reset button on main screen — only secondary button in the main block */
+/* Reset button — targets secondary buttons NOT inside the file uploader */
 [data-testid="stMainBlockContainer"] button[kind="secondary"] {
     background: linear-gradient(135deg, #ef4444, #dc2626) !important;
     color: #fff !important;
@@ -68,6 +68,21 @@ section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; 
     background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
     box-shadow: 0 4px 12px rgba(239,68,68,0.45) !important;
     transform: translateY(-1px) !important;
+}
+/* Restore file uploader Browse button to default — it also uses kind="secondary" */
+[data-testid="stFileUploader"] button[kind="secondary"] {
+    background: #fff !important;
+    color: #31333f !important;
+    border: 1px solid rgba(49,51,63,0.2) !important;
+    box-shadow: none !important;
+    font-size: .875rem !important;
+    font-weight: 400 !important;
+}
+[data-testid="stFileUploader"] button[kind="secondary"]:hover {
+    background: #f0f2f6 !important;
+    border-color: rgba(49,51,63,0.4) !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 /* ── Status banner ── */
@@ -1002,9 +1017,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-_spacer, _reset_col = st.columns([5, 1.6])
+_spacer, _reset_col = st.columns([6, 1])
 with _reset_col:
-    if st.button("🗑️  Reset History", use_container_width=True,
+    if st.button("🗑️ Reset", use_container_width=True,
                  help="Clear processed invoice history"):
         db_reset()
         st.toast("History cleared.", icon="🗑️")
