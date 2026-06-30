@@ -53,40 +53,6 @@ section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; 
 [data-testid="stSidebar"] * { color: #cbd5e1 !important; }
 [data-testid="stSidebar"] hr { border-color: #1e293b !important; }
 
-/* Reset button — targets secondary buttons NOT inside the file uploader */
-[data-testid="stMainBlockContainer"] button[kind="secondary"] {
-    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: .8rem !important;
-    box-shadow: 0 2px 8px rgba(239,68,68,0.3) !important;
-    transition: all .15s ease !important;
-}
-[data-testid="stMainBlockContainer"] button[kind="secondary"]:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    box-shadow: 0 4px 12px rgba(239,68,68,0.45) !important;
-    transform: translateY(-1px) !important;
-}
-/* Restore file uploader Browse button — chain both parents for higher specificity */
-[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button,
-[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button[kind="secondary"] {
-    background: #ffffff !important;
-    color: #31333f !important;
-    border: 1px solid rgba(49,51,63,0.2) !important;
-    box-shadow: none !important;
-    font-size: .875rem !important;
-    font-weight: 400 !important;
-    transform: none !important;
-}
-[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button:hover,
-[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button[kind="secondary"]:hover {
-    background: #f0f2f6 !important;
-    border-color: rgba(49,51,63,0.4) !important;
-    box-shadow: none !important;
-    transform: none !important;
-}
 
 /* ── Status banner ── */
 .banner { border-radius:12px; padding:20px 28px; margin-bottom:20px; display:flex; align-items:center; gap:20px; }
@@ -259,16 +225,38 @@ button[kind="primary"]:hover {
 }
 
 
-/* ── Upload area refinement ── */
-[data-testid="stFileUploader"] {
-    border: 2px dashed #cbd5e1 !important;
-    border-radius: 12px !important;
-    background: #f8fafc !important;
-    transition: border-color .2s ease !important;
+/* ── Custom upload zone (replaces native file uploader chrome) ── */
+.custom-upload-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: #f8fafc;
+    transition: border-color .2s, background .2s;
+    user-select: none;
 }
-[data-testid="stFileUploader"]:hover {
-    border-color: #3b82f6 !important;
+.custom-upload-zone:hover {
+    border-color: #6366f1;
+    background: #eef2ff;
 }
+.custom-upload-zone-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.custom-upload-zone-title { font-weight: 600; color: #1e293b; font-size: .9rem; margin-bottom: 4px; }
+.custom-upload-zone-sub { font-size: .78rem; color: #64748b; }
+
+/* Visually hide native uploader chrome but keep it in DOM & functional */
+[data-testid="stFileUploadDropzone"] {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0,0,0,0) !important;
+    border: 0 !important; opacity: 0 !important;
+}
+[data-testid="stFileUploader"] > div:first-child {
+    min-height: 0 !important;
+}
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] span { display: none !important; }
 
 /* ── Tab styling ── */
 [data-testid="stTabs"] [data-testid="stTab"] {
@@ -769,12 +757,36 @@ def mode_single():
 
     col_up, col_pick = st.columns([1, 1])
     with col_up:
+        has_file = bool(st.session_state.get("invoice_upload"))
+        if not has_file:
+            st.markdown("""
+            <div class="custom-upload-zone" onclick="
+                var inp = document.querySelector('[data-testid=stFileUploadDropzone] input[type=file]');
+                if (!inp) inp = document.querySelector('[data-testid=stFileUploader] input[type=file]');
+                if (inp) inp.click();
+            ">
+                <div class="custom-upload-zone-icon">📄</div>
+                <div class="custom-upload-zone-title">Click to browse or drag &amp; drop</div>
+                <div class="custom-upload-zone-sub">TXT · JSON · CSV · XML · PDF &nbsp;·&nbsp; up to 200 MB</div>
+            </div>
+            """, unsafe_allow_html=True)
         uploaded = st.file_uploader(
-            "Upload invoice",
+            "",
             type=["txt", "json", "csv", "xml", "pdf"],
-            help="Supported: TXT, JSON, CSV, XML, PDF",
             label_visibility="collapsed",
+            key="invoice_upload",
         )
+        if uploaded:
+            st.markdown(f"""
+            <div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;
+                        border:1px solid #86efac;border-radius:10px;padding:12px 16px;margin-top:4px">
+                <span style="font-size:1.2rem">✅</span>
+                <div>
+                    <div style="font-weight:600;color:#166534;font-size:.875rem">{uploaded.name}</div>
+                    <div style="font-size:.75rem;color:#16a34a">{uploaded.size:,} bytes · ready to process</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     with col_pick:
         sample_names = ["— or select a sample invoice —"] + [f.name for f in sample_files]
         selected_sample = st.selectbox("Sample", sample_names, label_visibility="collapsed")
@@ -1010,23 +1022,28 @@ def mode_history():
 
 
 
-# ── Reset button — floated right, clear of the Streamlit header ────────────────
-st.markdown("""
-<style>
-/* Push the very first block element down so it clears the fixed header */
-[data-testid="stMainBlockContainer"] > div:first-child {
-    margin-top: 0.5rem;
-}
-</style>
-""", unsafe_allow_html=True)
+# ── Reset via query param (pure HTML — avoids CSS conflicts with file uploader) ─
+if st.query_params.get("reset") == "1":
+    db_reset()
+    st.query_params.clear()
+    st.rerun()
 
-_spacer, _reset_col = st.columns([6, 1])
-with _reset_col:
-    if st.button("🗑️ Reset", use_container_width=True,
-                 help="Clear processed invoice history"):
-        db_reset()
-        st.toast("History cleared.", icon="🗑️")
-        st.rerun()
+st.markdown("""
+<div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+  <a href="?reset=1" style="
+    display:inline-flex;align-items:center;gap:6px;
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+    color:#fff !important;text-decoration:none;
+    font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;
+    padding:7px 16px;border-radius:8px;
+    box-shadow:0 2px 8px rgba(239,68,68,0.3);
+    transition:all .15s ease;
+  " onmouseover="this.style.background='linear-gradient(135deg,#dc2626,#b91c1c)'"
+     onmouseout="this.style.background='linear-gradient(135deg,#ef4444,#dc2626)'">
+    🗑️ Reset History
+  </a>
+</div>
+""", unsafe_allow_html=True)
 
 # ── Dispatch ───────────────────────────────────────────────────────────────────
 if mode == "Process Invoice":
