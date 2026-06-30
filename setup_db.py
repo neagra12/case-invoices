@@ -15,7 +15,7 @@ def setup():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # ── Inventory ────────────────────────────────────────────────────────────
+    # ── Create tables first ───────────────────────────────────────────────────
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS inventory (
             item        TEXT PRIMARY KEY,
@@ -25,19 +25,6 @@ def setup():
         )
     """)
 
-    cursor.execute("DELETE FROM inventory")          # idempotent re-run
-    cursor.execute("DELETE FROM processed_invoices") # clear history on re-init
-    cursor.executemany(
-        "INSERT INTO inventory VALUES (?, ?, ?, ?)",
-        [
-            ("WidgetA",     15,  250.00, "Widget"),
-            ("WidgetB",     10,  500.00, "Widget"),
-            ("GadgetX",      5,  750.00, "Gadget"),
-            ("FakeItem",     0, 1000.00, "Suspicious"),
-        ],
-    )
-
-    # ── Processed invoices (duplicate detection) ──────────────────────────────
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS processed_invoices (
             invoice_number  TEXT NOT NULL,
@@ -48,6 +35,19 @@ def setup():
             revision        TEXT
         )
     """)
+
+    # ── Seed data (idempotent) ────────────────────────────────────────────────
+    cursor.execute("DELETE FROM inventory")
+    cursor.execute("DELETE FROM processed_invoices")
+    cursor.executemany(
+        "INSERT INTO inventory VALUES (?, ?, ?, ?)",
+        [
+            ("WidgetA",     15,  250.00, "Widget"),
+            ("WidgetB",     10,  500.00, "Widget"),
+            ("GadgetX",      5,  750.00, "Gadget"),
+            ("FakeItem",     0, 1000.00, "Suspicious"),
+        ],
+    )
 
     conn.commit()
     conn.close()
