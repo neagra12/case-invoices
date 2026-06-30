@@ -159,6 +159,8 @@ All 16 provided invoices are handled and verified:
 
 ## Above & Beyond
 
+**Deployed to Streamlit Community Cloud:** The app is live at [case-invoices-task.streamlit.app](https://case-invoices-task.streamlit.app/) with auto-DB initialisation on first boot and API keys managed via Streamlit Secrets.
+
 **7 format parsers:** Plain text, JSON (including nested vendor objects), two CSV layouts, XML, PDF, and raw email bodies. The parser auto-detects format and routes accordingly with no LLM cost at the parsing stage.
 
 **Aggregate stock checking:** Validation sums quantities per item across all line rows before checking inventory. This correctly catches INV-1013 where GadgetX is split across 4 entries (5 + 3 + 1 = 9 units against stock of 5). A naive per-row check would pass it incorrectly.
