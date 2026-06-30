@@ -936,7 +936,7 @@ def mode_batch():
         err_codes = [f["code"] for f in vr.get("flags",[]) if f["severity"]=="error"]
         status = (pay.get("status") or ("error" if state.get("error") else "—")).upper()
         rows.append({
-            "File":        fname,
+            "File":        Path(fname).name,
             "Invoice #":   inv.get("invoice_number","?"),
             "Vendor":      (inv.get("vendor") or "?")[:22],
             "Amount":      f"${inv.get('total',0):,.2f}" if inv else "—",
@@ -963,7 +963,7 @@ def mode_batch():
         status = (pay.get("status") or ("error" if state.get("error") else "—")).upper()
         icon   = "✅" if status=="PAID" else "🚫" if status=="REJECTED" else "⚠️"
         inv    = state.get("invoice_data") or {}
-        label  = f"{icon} {fname}  ·  {inv.get('invoice_number','?')}  ·  ${inv.get('total',0):,.2f}  ·  {status}"
+        label  = f"{icon} {Path(fname).name}  ·  {inv.get('invoice_number','?')}  ·  ${inv.get('total',0):,.2f}  ·  {status}"
         with st.expander(label):
             render_result(state, compact=True)
 
