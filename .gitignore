@@ -18,8 +18,8 @@ __pycache__/
 venv/
 env/
 
-# Streamlit
-.streamlit/
+# Streamlit — ignore secrets only, keep config.toml
+.streamlit/secrets.toml
 
 # OS
 .DS_Store
