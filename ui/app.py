@@ -69,16 +69,19 @@ section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; 
     box-shadow: 0 4px 12px rgba(239,68,68,0.45) !important;
     transform: translateY(-1px) !important;
 }
-/* Restore file uploader Browse button to default — it also uses kind="secondary" */
-[data-testid="stFileUploader"] button[kind="secondary"] {
-    background: #fff !important;
+/* Restore file uploader Browse button — chain both parents for higher specificity */
+[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button,
+[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button[kind="secondary"] {
+    background: #ffffff !important;
     color: #31333f !important;
     border: 1px solid rgba(49,51,63,0.2) !important;
     box-shadow: none !important;
     font-size: .875rem !important;
     font-weight: 400 !important;
+    transform: none !important;
 }
-[data-testid="stFileUploader"] button[kind="secondary"]:hover {
+[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button:hover,
+[data-testid="stMainBlockContainer"] [data-testid="stFileUploader"] button[kind="secondary"]:hover {
     background: #f0f2f6 !important;
     border-color: rgba(49,51,63,0.4) !important;
     box-shadow: none !important;
