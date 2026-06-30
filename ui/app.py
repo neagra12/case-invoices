@@ -23,22 +23,46 @@ st.set_page_config(
 # ── CSS ────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-/* ── Base ── */
-[data-testid="stAppViewContainer"] { background: #f8fafc; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ── Toolbar / top bar — match main bg so it doesn't look broken ── */
+/* ── Base ── */
+[data-testid="stAppViewContainer"] { background: #f1f5f9; }
+[data-testid="stMainBlockContainer"] { padding-top: 3rem !important; }
+
+/* Apply Inter ONLY to main content — never touch sidebar to avoid breaking Material Icons arrow */
+[data-testid="stMainBlockContainer"] * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* ── Toolbar ── */
 header[data-testid="stHeader"] {
-    background: #f8fafc !important;
+    background: #f1f5f9 !important;
     border-bottom: 1px solid #e2e8f0 !important;
 }
 
-/* ── Sidebar — remove excess top padding ── */
-[data-testid="stSidebar"] { background: #1e293b !important; }
+/* ── Sidebar ── */
+[data-testid="stSidebar"] { background: #0f172a !important; }
 [data-testid="stSidebarContent"] { padding-top: 0.75rem !important; }
 section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; }
-[data-testid="stSidebar"] * { color: #e2e8f0 !important; }
-[data-testid="stSidebar"] hr { border-color: #334155 !important; }
-[data-testid="stSidebar"] h1 { color: #f1f5f9 !important; font-size: 1.1rem !important; }
+[data-testid="stSidebar"] * { color: #cbd5e1 !important; }
+[data-testid="stSidebar"] hr { border-color: #1e293b !important; }
+
+/* Reset button on main screen — only secondary button in the main block */
+[data-testid="stMainBlockContainer"] button[kind="secondary"] {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: .8rem !important;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.3) !important;
+    transition: all .15s ease !important;
+}
+[data-testid="stMainBlockContainer"] button[kind="secondary"]:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    box-shadow: 0 4px 12px rgba(239,68,68,0.45) !important;
+    transform: translateY(-1px) !important;
+}
 
 /* ── Status banner ── */
 .banner { border-radius:12px; padding:20px 28px; margin-bottom:20px; display:flex; align-items:center; gap:20px; }
@@ -110,72 +134,106 @@ section[data-testid="stSidebar"] > div:first-child { padding-top: 0 !important; 
 .biz-metric-label { font-size:.78rem; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
 
 /* ── Sidebar stat ── */
-.sb-stat { background:#334155; border-radius:8px; padding:10px 14px; margin-bottom:8px; }
-.sb-stat-val { font-size:1.3rem; font-weight:700; color:#f1f5f9; }
-.sb-stat-label { font-size:.72rem; color:#94a3b8; text-transform:uppercase; letter-spacing:.05em; }
+.sb-stat { background:#1e293b; border-radius:10px; padding:12px 16px; margin-bottom:8px;
+           border:1px solid #334155; }
+.sb-stat-val { font-size:1.4rem; font-weight:800; color:#f8fafc; letter-spacing:-.02em; }
+.sb-stat-label { font-size:.68rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; margin-top:1px; }
 
 /* ── Confidence bar ── */
 .conf-bar-wrap { background:#e2e8f0; border-radius:4px; height:8px; margin-top:4px; }
 .conf-bar { background:#22c55e; border-radius:4px; height:8px; }
 
-/* ── Reset History button — make it a visible danger button ── */
-[data-testid="stSidebar"] [data-testid="stBaseButton-secondary"] button,
-[data-testid="stSidebar"] .stButton button {
-    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.03em !important;
-    box-shadow: 0 2px 6px rgba(239,68,68,0.35) !important;
-    transition: all .15s ease !important;
-}
-[data-testid="stSidebar"] [data-testid="stBaseButton-secondary"] button:hover,
-[data-testid="stSidebar"] .stButton button:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    box-shadow: 0 4px 10px rgba(239,68,68,0.45) !important;
-    transform: translateY(-1px) !important;
-}
+/* ── Invoice detail card ── */
+.detail-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px 24px; }
+.detail-card-title { font-size:.7rem; font-weight:700; text-transform:uppercase;
+                     letter-spacing:.08em; color:#94a3b8; margin-bottom:14px; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; }
+.detail-item-label { font-size:.72rem; color:#94a3b8; text-transform:uppercase;
+                     letter-spacing:.05em; margin-bottom:2px; }
+.detail-item-val { font-size:.95rem; font-weight:600; color:#1e293b; }
+.detail-item-val.missing { color:#ef4444; font-style:italic; font-weight:400; }
 
-/* ── Main header area ── */
-.main-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border-radius: 14px;
-    padding: 28px 32px;
-    margin-bottom: 24px;
-    color: #f1f5f9;
+/* ── Verdict card ── */
+.verdict-approved { background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+                    border:1px solid #86efac; border-radius:12px; padding:20px 24px; margin-bottom:16px; }
+.verdict-rejected { background:linear-gradient(135deg,#fef2f2,#fee2e2);
+                    border:1px solid #fca5a5; border-radius:12px; padding:20px 24px; margin-bottom:16px; }
+.verdict-label { font-size:1.3rem; font-weight:700; margin:0 0 4px; }
+.verdict-sub   { font-size:.85rem; opacity:.75; margin:0; }
+
+/* ── Receipt card ── */
+.receipt { background:#fff; border:1px solid #e2e8f0; border-radius:12px;
+           padding:24px; max-width:460px; }
+.receipt-header { display:flex; justify-content:space-between; align-items:flex-start;
+                  margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #f1f5f9; }
+.receipt-title  { font-size:1rem; font-weight:700; color:#1e293b; margin:0; }
+.receipt-badge-paid { background:#dcfce7; color:#166534; font-size:.72rem;
+                      font-weight:700; padding:3px 10px; border-radius:20px; }
+.receipt-badge-fail { background:#fee2e2; color:#991b1b; font-size:.72rem;
+                      font-weight:700; padding:3px 10px; border-radius:20px; }
+.receipt-row { display:flex; justify-content:space-between; margin-bottom:10px;
+               font-size:.875rem; }
+.receipt-row-label { color:#64748b; }
+.receipt-row-val   { font-weight:600; color:#1e293b; }
+.receipt-amount { font-size:1.6rem; font-weight:700; color:#1e293b;
+                  text-align:right; margin-top:16px; padding-top:16px;
+                  border-top:2px solid #f1f5f9; }
+.receipt-txn { font-size:.72rem; color:#94a3b8; text-align:right; margin-top:4px;
+               font-family:monospace; }
+
+/* ── Empty state ── */
+.empty-state { text-align:center; padding:48px 24px; }
+.empty-state-title { font-size:1.1rem; font-weight:700; color:#1e293b; margin:16px 0 8px; }
+.empty-state-sub { font-size:.875rem; color:#64748b; margin:0; }
+.how-it-works { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:32px 0; }
+.how-step { background:#fff; border:1px solid #e2e8f0; border-radius:12px;
+            padding:20px 16px; text-align:center; }
+.how-step-num { width:32px; height:32px; border-radius:50%; display:inline-flex;
+                align-items:center; justify-content:center; font-weight:700;
+                font-size:.8rem; margin-bottom:10px; }
+.how-step-num-1 { background:#eff6ff; color:#2563eb; }
+.how-step-num-2 { background:#f0fdf4; color:#16a34a; }
+.how-step-num-3 { background:#fef9c3; color:#ca8a04; }
+.how-step-num-4 { background:#fdf4ff; color:#9333ea; }
+.how-step-name { font-size:.85rem; font-weight:700; color:#1e293b; margin-bottom:4px; }
+.how-step-desc { font-size:.75rem; color:#64748b; line-height:1.4; }
+
+
+/* ── Page heading ── */
+.page-heading { margin-bottom: 28px; }
+.page-heading-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #6366f1;
+    background: #eef2ff; border-radius: 20px;
+    padding: 3px 10px; margin-bottom: 10px;
 }
-.main-header h2 { margin: 0 0 4px; font-size: 1.5rem; color: #f8fafc; }
-.main-header p  { margin: 0; font-size: 0.9rem; color: #94a3b8; }
+.page-heading h1 {
+    font-size: 2rem; font-weight: 800; margin: 0 0 6px;
+    color: #0f172a; letter-spacing: -.03em; line-height: 1.15;
+}
+.page-heading h1 span {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.page-heading p { margin: 0; font-size: .925rem; color: #64748b; line-height: 1.6; }
 
 /* ── Run pipeline button (primary) ── */
 button[kind="primary"] {
-    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
     color: white !important;
     border: none !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
-    box-shadow: 0 2px 8px rgba(59,130,246,0.4) !important;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.4) !important;
     transition: all .15s ease !important;
 }
 button[kind="primary"]:hover {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    box-shadow: 0 4px 14px rgba(59,130,246,0.5) !important;
+    background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.5) !important;
     transform: translateY(-1px) !important;
 }
 
-/* ── Top-right Reset button ── */
-[data-testid="stButton"][key="top_reset_btn"] button,
-div:has(> [data-testid="baseButton-secondary"]#top_reset_btn) button {
-    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 6px !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-    padding: 6px 12px !important;
-    box-shadow: 0 2px 6px rgba(239,68,68,0.35) !important;
-}
 
 /* ── Upload area refinement ── */
 [data-testid="stFileUploader"] {
@@ -239,8 +297,17 @@ def db_reset():
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🏭 Acme Corp AP")
-    st.caption("Invoice Automation System")
+    st.markdown("""
+    <div style="padding:4px 0 16px">
+        <div style="font-size:1.05rem;font-weight:800;color:#f8fafc;letter-spacing:-.02em">
+            🏭 Acme Corp
+        </div>
+        <div style="font-size:.72rem;color:#6366f1;font-weight:600;letter-spacing:.06em;
+                    text-transform:uppercase;margin-top:2px">
+            AP Automation
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     st.divider()
 
     mode = st.radio("View", ["Process Invoice", "Batch Run", "Processing History"],
@@ -269,7 +336,6 @@ with st.sidebar:
     show_log = st.toggle("Show agent log", value=False)
     show_raw = st.toggle("Show raw invoice text", value=False)
     st.divider()
-    st.markdown('<p style="font-size:.72rem;color:#475569;margin:0;text-align:center">Use the 🗑️ Reset button (top right)</p>', unsafe_allow_html=True)
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -452,30 +518,55 @@ def render_result(state: dict, compact: bool = False) -> None:
         if inv:
             c1, c2 = st.columns([1, 1])
             with c1:
-                st.markdown("**Invoice Details**")
-                details = {
-                    "Number":   inv.get("invoice_number", "—"),
-                    "Vendor":   inv.get("vendor") or "*(missing)*",
-                    "Date":     str(inv.get("date") or "—"),
-                    "Due Date": str(inv.get("due_date") or "*(missing)*"),
-                    "Currency": inv.get("currency", "USD"),
-                    "Terms":    inv.get("payment_terms") or "—",
-                }
-                for k, v in details.items():
-                    st.markdown(f"**{k}:** {v}")
+                # Styled detail card
+                def _val(v, missing=False):
+                    cls = "detail-item-val missing" if missing else "detail-item-val"
+                    return f'<div class="{cls}">{v}</div>'
 
-                # Confidence bar
-                conf = inv.get("confidence", 1.0)
+                vendor    = inv.get("vendor") or None
+                due_date  = inv.get("due_date") or None
+                conf      = inv.get("confidence", 1.0)
                 conf_color = "#22c55e" if conf >= 0.85 else "#f59e0b" if conf >= 0.6 else "#ef4444"
-                st.markdown(f"**Extraction confidence:** {conf:.0%}")
-                st.markdown(
-                    f'<div class="conf-bar-wrap"><div class="conf-bar" '
-                    f'style="width:{conf*100:.0f}%;background:{conf_color}"></div></div>',
-                    unsafe_allow_html=True,
-                )
+
+                st.markdown(f"""
+                <div class="detail-card">
+                  <div class="detail-card-title">Invoice Details</div>
+                  <div class="detail-grid">
+                    <div>
+                      <div class="detail-item-label">Invoice #</div>
+                      {_val(inv.get("invoice_number","—"))}
+                    </div>
+                    <div>
+                      <div class="detail-item-label">Vendor</div>
+                      {_val(vendor or "missing", missing=not vendor)}
+                    </div>
+                    <div>
+                      <div class="detail-item-label">Date</div>
+                      {_val(str(inv.get("date") or "—"))}
+                    </div>
+                    <div>
+                      <div class="detail-item-label">Due Date</div>
+                      {_val(str(due_date) if due_date else "missing", missing=not due_date)}
+                    </div>
+                    <div>
+                      <div class="detail-item-label">Currency</div>
+                      {_val(inv.get("currency","USD"))}
+                    </div>
+                    <div>
+                      <div class="detail-item-label">Terms</div>
+                      {_val(inv.get("payment_terms") or "—")}
+                    </div>
+                  </div>
+                  <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f1f5f9">
+                    <div class="detail-item-label">Extraction Confidence — {conf:.0%}</div>
+                    <div class="conf-bar-wrap" style="margin-top:6px">
+                      <div class="conf-bar" style="width:{conf*100:.0f}%;background:{conf_color}"></div>
+                    </div>
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
 
             with c2:
-                st.markdown("**Line Items**")
                 st.markdown(
                     line_items_html(
                         inv.get("line_items", []),
@@ -487,10 +578,10 @@ def render_result(state: dict, compact: bool = False) -> None:
                 )
 
             if inv.get("ingestion_flags"):
-                st.markdown("---")
-                st.markdown("**Ingestion Notes**")
-                for f in inv["ingestion_flags"]:
-                    st.warning(f)
+                st.markdown("<div style='margin-top:16px'>", unsafe_allow_html=True)
+                iflags = [{"severity":"warning","code":"INGEST","message":f} for f in inv["ingestion_flags"]]
+                st.markdown(flag_html(iflags), unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
 
             if show_raw and state.get("raw_text"):
                 with st.expander("Raw invoice text"):
@@ -541,23 +632,30 @@ def render_result(state: dict, compact: bool = False) -> None:
     # ── Tab 3: Approval ─────────────────────────────────────────────────────────
     with tabs[2]:
         if ar:
-            approved     = ar.get("approved", False)
-            scrutiny     = ar.get("requires_scrutiny", False)
-            risk_level   = "high" if not approved else ("medium" if scrutiny else "low")
-            risk_label   = risk_level.upper()
+            approved   = ar.get("approved", False)
+            scrutiny   = ar.get("requires_scrutiny", False)
+            risk_level = "high" if not approved else ("medium" if scrutiny else "low")
 
-            col_a, col_b = st.columns([3, 1])
-            with col_a:
-                label = "✅ Approved" if approved else "🚫 Rejected"
-                st.markdown(f"### {label}")
-                if scrutiny:
-                    st.markdown("⚑ **High-value invoice** — enhanced VP scrutiny applied (>$10,000 threshold)")
-            with col_b:
-                st.markdown(
-                    f'<div style="text-align:right"><span class="risk-badge risk-{risk_level}">'
-                    f'Risk: {risk_label}</span></div>',
-                    unsafe_allow_html=True,
-                )
+            # Prominent verdict card
+            verdict_css = "verdict-approved" if approved else "verdict-rejected"
+            verdict_icon = "✅" if approved else "🚫"
+            verdict_text = "Approved for Payment" if approved else "Rejected"
+            verdict_sub  = ("Enhanced VP scrutiny applied — invoice exceeds $10,000 threshold"
+                            if scrutiny else
+                            "Auto-approved — all checks passed within normal parameters"
+                            if approved else
+                            "Invoice failed one or more approval criteria")
+            st.markdown(f"""
+            <div class="{verdict_css}">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <p class="verdict-label">{verdict_icon} {verdict_text}</p>
+                  <p class="verdict-sub">{verdict_sub}</p>
+                </div>
+                <span class="risk-badge risk-{risk_level}">Risk: {risk_level.upper()}</span>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
 
             # Reasoning
             st.markdown(
@@ -566,7 +664,7 @@ def render_result(state: dict, compact: bool = False) -> None:
             )
 
             # Self-critique — the "Above and Beyond" feature
-            with st.expander("🔄 Self-Critique Loop (AI second opinion)"):
+            with st.expander("🔄 Self-Critique Loop — AI second opinion"):
                 st.caption(
                     "After the initial decision, the agent critiques its own reasoning "
                     "and may revise. This reflection loop catches edge cases and reduces false rejections."
@@ -581,22 +679,42 @@ def render_result(state: dict, compact: bool = False) -> None:
     # ── Tab 4: Payment ──────────────────────────────────────────────────────────
     with tabs[3]:
         if pay:
-            status = pay.get("status", "")
-            vendor = pay.get("vendor", inv.get("vendor", "—"))
-            amount = pay.get("amount", inv.get("total", 0))
+            status   = pay.get("status", "")
+            vendor   = pay.get("vendor", inv.get("vendor", "—"))
+            amount   = pay.get("amount", inv.get("total", 0))
             currency = inv.get("currency", "USD")
+            detail   = pay.get("detail", "")
+            txn_id   = ""
+            if "TXN-" in detail:
+                txn_id = "TXN-" + detail.split("TXN-")[-1].strip()
 
-            if status == "paid":
-                st.success(f"**Payment processed** — {currency} {amount:,.2f} sent to **{vendor}**")
-                detail = pay.get("detail", "")
-                if "TXN-" in detail:
-                    txn = detail.split("TXN-")[-1].strip()
-                    st.caption(f"Transaction ID: TXN-{txn}")
-            elif status == "rejected":
-                st.error(f"**Payment blocked** — {currency} {amount:,.2f} withheld from {vendor}")
-                st.markdown("**Rejection reason logged to AP system.**")
-            else:
-                st.warning(pay.get("detail", "Unknown status"))
+            badge_cls = "receipt-badge-paid" if status == "paid" else "receipt-badge-fail"
+            badge_txt = "PAYMENT PROCESSED" if status == "paid" else "PAYMENT BLOCKED"
+
+            st.markdown(f"""
+            <div class="receipt">
+              <div class="receipt-header">
+                <p class="receipt-title">Payment Record</p>
+                <span class="{badge_cls}">{badge_txt}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-row-label">Vendor</span>
+                <span class="receipt-row-val">{vendor}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-row-label">Invoice</span>
+                <span class="receipt-row-val">{inv.get("invoice_number","—")}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-row-label">Currency</span>
+                <span class="receipt-row-val">{currency}</span>
+              </div>
+              {"<div class='receipt-row'><span class='receipt-row-label'>Due Date</span><span class='receipt-row-val'>" + str(inv.get('due_date') or '—') + "</span></div>" if inv.get("due_date") else ""}
+              <div class="receipt-amount">{currency} {amount:,.2f}</div>
+              {"<div class='receipt-txn'>" + txn_id + "</div>" if txn_id else ""}
+              {"<div style='margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9;font-size:.8rem;color:#64748b'>Rejection logged to AP audit system. No funds transferred.</div>" if status != "paid" else ""}
+            </div>
+            """, unsafe_allow_html=True)
         else:
             st.info("Payment stage not reached.")
 
@@ -615,8 +733,9 @@ def render_result(state: dict, compact: bool = False) -> None:
 # ── Mode: Process Invoice ──────────────────────────────────────────────────────
 def mode_single():
     st.markdown("""
-    <div class="main-header">
-        <h2>Process Invoice</h2>
+    <div class="page-heading">
+        <div class="page-heading-eyebrow">⚡ AI-Powered</div>
+        <h1>Process <span>Invoice</span></h1>
         <p>Upload any invoice format — the 4-agent pipeline handles ingestion, validation, approval and payment automatically.</p>
     </div>
     """, unsafe_allow_html=True)
@@ -638,6 +757,32 @@ def mode_single():
 
     run_btn = st.button("▶  Run Pipeline", type="primary")
 
+    if not run_btn:
+        st.markdown("""
+        <div class="how-it-works">
+          <div class="how-step">
+            <div class="how-step-num how-step-num-1">1</div>
+            <div class="how-step-name">Ingestion</div>
+            <div class="how-step-desc">Parses 7 formats — TXT, JSON, CSV, XML, PDF, email. LLM normalises with self-correction retry.</div>
+          </div>
+          <div class="how-step">
+            <div class="how-step-num how-step-num-2">2</div>
+            <div class="how-step-name">Validation</div>
+            <div class="how-step-desc">Checks inventory stock, flags duplicates, detects fraud signals and data errors.</div>
+          </div>
+          <div class="how-step">
+            <div class="how-step-num how-step-num-3">3</div>
+            <div class="how-step-name">Approval</div>
+            <div class="how-step-desc">VP-level LLM review with self-critique reflection loop. >$10K triggers high-value scrutiny.</div>
+          </div>
+          <div class="how-step">
+            <div class="how-step-num how-step-num-4">4</div>
+            <div class="how-step-name">Payment</div>
+            <div class="how-step-desc">Approved invoices are paid via mock API. All outcomes are logged to the SQLite audit trail.</div>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
     if run_btn:
         from orchestrator import process_invoice
         path = None
@@ -653,7 +798,7 @@ def mode_single():
             st.warning("Select a sample invoice or upload a file to continue.")
             return
 
-        with st.spinner("Running 4-stage pipeline…"):
+        with st.spinner("Running pipeline — this takes ~15–20s with Grok-3…"):
             t0 = time.time()
             state = process_invoice(path)
             elapsed = time.time() - t0
@@ -666,9 +811,10 @@ def mode_single():
 # ── Mode: Batch Run ────────────────────────────────────────────────────────────
 def mode_batch():
     st.markdown("""
-    <div class="main-header">
-        <h2>Batch Processing</h2>
-        <p>Process all invoices in the test suite and see aggregate business impact across the full pipeline.</p>
+    <div class="page-heading">
+        <div class="page-heading-eyebrow">📦 Full Suite</div>
+        <h1><span>Batch</span> Processing</h1>
+        <p>Run all 16 test invoices through the full pipeline and see aggregate business impact.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -721,11 +867,26 @@ def mode_batch():
 
     st.markdown("### Business Impact")
     c1,c2,c3,c4 = st.columns(4)
-    c1.metric("✅ Invoices Cleared", len(paid_results), f"${paid_total:,.0f}")
-    c2.metric("🚫 Invoices Blocked", len(rej_results), f"${blocked_total:,.0f} protected")
-    c3.metric("🔴 Fraud / Suspicious", len(fraud_results), "detected & blocked")
-    c4.metric("⏱ Total Processing Time", f"{total_elapsed:.0f}s",
-              f"vs. ~{len(results)*5*60//60}h manual")
+    c1.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">✅ Cleared</div>
+        <div class="biz-metric-val" style="color:#16a34a">{len(paid_results)}</div>
+        <div style="font-size:.8rem;color:#64748b">${paid_total:,.0f} processed</div>
+    </div>""", unsafe_allow_html=True)
+    c2.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">🚫 Blocked</div>
+        <div class="biz-metric-val" style="color:#dc2626">{len(rej_results)}</div>
+        <div style="font-size:.8rem;color:#64748b">${blocked_total:,.0f} protected</div>
+    </div>""", unsafe_allow_html=True)
+    c3.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">🔴 Fraud / Suspicious</div>
+        <div class="biz-metric-val" style="color:#dc2626">{len(fraud_results)}</div>
+        <div style="font-size:.8rem;color:#64748b">detected & blocked</div>
+    </div>""", unsafe_allow_html=True)
+    c4.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">⏱ Processing Time</div>
+        <div class="biz-metric-val">{total_elapsed:.0f}s</div>
+        <div style="font-size:.8rem;color:#64748b">vs ~{len(results)*5}min manual</div>
+    </div>""", unsafe_allow_html=True)
 
     # ── Results table ──────────────────────────────────────────────────────────
     st.markdown("### All Invoices")
@@ -774,16 +935,40 @@ def mode_batch():
 # ── Mode: Processing History ───────────────────────────────────────────────────
 def mode_history():
     st.markdown("""
-    <div class="main-header">
-        <h2>Processing History</h2>
+    <div class="page-heading">
+        <div class="page-heading-eyebrow">🗄️ Audit Log</div>
+        <h1>Processing <span>History</span></h1>
         <p>All invoices processed in this session — pulled live from the local SQLite audit database.</p>
     </div>
     """, unsafe_allow_html=True)
 
     rows = db_history(limit=50)
     if not rows:
-        st.info("No invoices processed yet. Run the pipeline to see results here.")
+        st.markdown("""
+        <div class="empty-state">
+          <div style="font-size:2.5rem">📭</div>
+          <div class="empty-state-title">No invoices processed yet</div>
+          <p class="empty-state-sub">Switch to Process Invoice or Batch Run to get started.</p>
+        </div>
+        """, unsafe_allow_html=True)
         return
+
+    # Stats header
+    h_stats = db_stats()
+    hc1, hc2, hc3 = st.columns(3)
+    hc1.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">Total Processed</div>
+        <div class="biz-metric-val">{h_stats['total']}</div>
+    </div>""", unsafe_allow_html=True)
+    hc2.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">✅ Paid</div>
+        <div class="biz-metric-val" style="color:#16a34a">${h_stats['paid_amount']:,.0f}</div>
+    </div>""", unsafe_allow_html=True)
+    hc3.markdown(f"""<div class="biz-metric">
+        <div class="biz-metric-label">🚫 Rejected</div>
+        <div class="biz-metric-val" style="color:#dc2626">{h_stats['rejected']}</div>
+    </div>""", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top:16px'>", unsafe_allow_html=True)
 
     import pandas as pd
     df = pd.DataFrame(rows)
@@ -800,52 +985,23 @@ def mode_history():
                  use_container_width=True, hide_index=True)
 
 
-# ── Top-right Reset button (beside Deploy) ─────────────────────────────────────
+
+# ── Reset button — floated right, clear of the Streamlit header ────────────────
 st.markdown("""
 <style>
-.reset-btn-wrap {
-    position: fixed;
-    top: 10px;
-    right: 110px;
-    z-index: 9999;
-}
-.reset-btn-wrap a {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff !important;
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(239,68,68,0.35);
-    transition: all .15s ease;
-    cursor: pointer;
-    border: none;
-}
-.reset-btn-wrap a:hover {
-    background: linear-gradient(135deg,#dc2626,#b91c1c);
-    box-shadow: 0 4px 10px rgba(239,68,68,0.45);
-    transform: translateY(-1px);
+/* Push the very first block element down so it clears the fixed header */
+[data-testid="stMainBlockContainer"] > div:first-child {
+    margin-top: 0.5rem;
 }
 </style>
 """, unsafe_allow_html=True)
 
-_reset_key = "top_reset_clicked"
-if st.session_state.get(_reset_key):
-    db_reset()
-    st.session_state[_reset_key] = False
-    st.toast("History cleared.", icon="🗑️")
-    st.rerun()
-
-top_col_spacer, top_col_btn = st.columns([10, 1])
-with top_col_btn:
-    if st.button("🗑️ Reset", key="top_reset_btn",
-                 help="Clear processed invoice history",
-                 type="secondary"):
-        st.session_state[_reset_key] = True
+_spacer, _reset_col = st.columns([5, 1.6])
+with _reset_col:
+    if st.button("🗑️  Reset History", use_container_width=True,
+                 help="Clear processed invoice history"):
+        db_reset()
+        st.toast("History cleared.", icon="🗑️")
         st.rerun()
 
 # ── Dispatch ───────────────────────────────────────────────────────────────────
